@@ -51,40 +51,31 @@ import notificationRoutes from './routes/notifications.js';
 
 const app = express();
 
-// ✅ Allowed origins
+// --- CORS CONFIG ---
 const allowedOrigins = process.env.CLIENT_ORIGIN
   ? process.env.CLIENT_ORIGIN.split(',').map(o => o.trim())
   : ['http://localhost:5173', 'https://useexpensify.vercel.app'];
 
-// Debug log incoming origins
 app.use((req, res, next) => {
-  console.log('Incoming Origin:', req.headers.origin);
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
   next();
 });
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser clients
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      console.warn('Blocked by CORS:', origin);
-      return callback(new Error('CORS not allowed for this origin'));
-    }
-  },
-  credentials: true,
-}));
-
-// ✅ Explicitly handle preflight for all routes
-app.options('*', cors({
-  origin: allowedOrigins,
-  credentials: true,
-}));
-
+// --- MIDDLEWARE ---
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Routes
+// --- ROUTES ---
 app.get('/', (req, res) => res.json({ ok: true, message: 'Multi-Source Expense API' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/requests', requestRoutes);
@@ -93,6 +84,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/sources', sourceRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// --- START SERVER ---
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
