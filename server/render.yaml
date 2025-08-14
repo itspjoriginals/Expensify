@@ -1,0 +1,21 @@
+# Exported from Render on 2025-08-14T07:33:54Z
+services:
+- type: web
+  name: Expensify-Backend
+  runtime: node
+  repo: https://github.com/itspjoriginals/Expensify-Backend
+  plan: free
+  envVars:
+  - key: CLIENT_ORIGIN
+    sync: false
+  - key: JWT_SECRET
+    sync: false
+  - key: MONGO_URI
+    sync: false
+  - key: PORT
+    sync: false
+  region: singapore
+  buildCommand: npm install
+  startCommand: node src/index.js
+  autoDeployTrigger: commit
+version: "1"
