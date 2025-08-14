@@ -51,22 +51,34 @@ import notificationRoutes from './routes/notifications.js';
 
 const app = express();
 
-// ✅ Setup allowed origins from ENV or defaults
+// ✅ Allowed origins
 const allowedOrigins = process.env.CLIENT_ORIGIN
-  ? process.env.CLIENT_ORIGIN.split(',')
+  ? process.env.CLIENT_ORIGIN.split(',').map(o => o.trim())
   : ['http://localhost:5173', 'https://useexpensify.vercel.app'];
 
+// Debug log incoming origins
+app.use((req, res, next) => {
+  console.log('Incoming Origin:', req.headers.origin);
+  next();
+});
+
 app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps, curl)
-    if (!origin) return callback(null, true);
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser clients
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
+      console.warn('Blocked by CORS:', origin);
       return callback(new Error('CORS not allowed for this origin'));
     }
   },
-  credentials: true
+  credentials: true,
+}));
+
+// ✅ Explicitly handle preflight for all routes
+app.options('*', cors({
+  origin: allowedOrigins,
+  credentials: true,
 }));
 
 app.use(express.json());
