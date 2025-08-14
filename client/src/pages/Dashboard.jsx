@@ -269,19 +269,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import CountUp from 'react-countup'
 import EmptyState from '../components/EmptyState.jsx'
 import Toast from '../components/Toast.jsx'
+import { useTranslation } from 'react-i18next';
+
 
 export default function Dashboard() {
-  const { token, sources, setSources } = useAuth(); // ✅ global state
+  const { token, sources, setSources } = useAuth();
   const [tx, setTx] = useState([])
   const [form, setForm] = useState({ name: '', initialBalance: 0 })
   const [newTx, setNewTx] = useState({ sourceId: '', type: 'expense', amount: 0, category: '', description: '' })
   const [toast, setToast] = useState("")
+  const { t } = useTranslation();
 
   const load = async () => {
     const s = await api('/sources', { token })
-    setSources(s) // ✅ update global sources
-    const t = await api('/transactions?limit=20', { token })
-    setTx(t)
+    setSources(s)
+    const tData = await api('/transactions?limit=20', { token })
+    setTx(tData)
   }
 
   useEffect(() => { load() }, [])
@@ -311,7 +314,7 @@ export default function Dashboard() {
           transition={{ duration: 0.6 }}
           className="text-4xl font-extrabold text-gray-800 mb-8 flex items-center gap-3"
         >
-          📊 Dashboard
+          📊 {t('dashboard')}
         </motion.h1>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -322,14 +325,14 @@ export default function Dashboard() {
             animate={{ opacity: 1, x: 0 }}
           >
             <div className="flex justify-between mb-4">
-              <h2 className="text-xl font-semibold text-teal-700">Sources</h2>
+              <h2 className="text-xl font-semibold text-teal-700">{t('addSource')}</h2>
               <span className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full font-semibold">
-                Total: ₹<CountUp end={total} duration={1} separator="," />
+                {t('totalBalance')}: ₹<CountUp end={total} duration={1} separator="," />
               </span>
             </div>
 
             {sources.length === 0 ? (
-              <EmptyState icon="💼" message="No sources yet" subMessage="Add a source to begin tracking." color="text-teal-500" />
+              <EmptyState icon="💼" message={t('noSources', { defaultValue: 'No sources yet' })} subMessage={t('addSource', { defaultValue: 'Add a source to begin tracking.' })} color="text-teal-500" />
             ) : (
               <div className="mb-4 space-y-3">
                 <AnimatePresence>
@@ -361,10 +364,10 @@ export default function Dashboard() {
             )}
 
             <form onSubmit={createSource} className="space-y-3 border-t pt-3 mt-auto">
-              <b>Add Source</b>
-              <input className="border rounded-lg px-3 py-2 w-full" placeholder="Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-              <input className="border rounded-lg px-3 py-2 w-full" placeholder="Initial Balance" type="number" value={form.initialBalance} onChange={e => setForm({ ...form, initialBalance: e.target.value })} />
-              <button className="bg-teal-500 text-white rounded-lg py-2 w-full">➕ Create</button>
+              <b>{t('addSource')}</b>
+              <input className="border rounded-lg px-3 py-2 w-full" placeholder={t('name')} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+              <input className="border rounded-lg px-3 py-2 w-full" placeholder={t('totalBalance')} type="number" value={form.initialBalance} onChange={e => setForm({ ...form, initialBalance: e.target.value })} />
+              <button className="bg-teal-500 text-white rounded-lg py-2 w-full">➕ {t('createFund', { defaultValue: 'Create' })}</button>
             </form>
           </motion.div>
 
@@ -374,24 +377,24 @@ export default function Dashboard() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <h2 className="text-xl font-semibold text-purple-700 mb-4">Add Transaction</h2>
+            <h2 className="text-xl font-semibold text-purple-700 mb-4">{t('addTransaction')}</h2>
             <form onSubmit={addTx} className="grid gap-3 mb-8">
               <select className="border rounded-lg px-3 py-2" value={newTx.sourceId} onChange={e => setNewTx({ ...newTx, sourceId: e.target.value })}>
-                <option>-- Select Source --</option>
+                <option>{t('addSource')}</option>
                 {sources.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
               </select>
               <select className="border rounded-lg px-3 py-2" value={newTx.type} onChange={e => setNewTx({ ...newTx, type: e.target.value })}>
-                <option value='expense'>Expense</option>
-                <option value='income'>Income</option>
+                <option value='expense'>{t('amount')}</option>
+                <option value='income'>{t('income', { defaultValue: 'Income' })}</option>
               </select>
-              <input className="border rounded-lg px-3 py-2" placeholder="Amount" type="number" value={newTx.amount} onChange={e => setNewTx({ ...newTx, amount: e.target.value })} />
-              <input className="border rounded-lg px-3 py-2" placeholder="Category" value={newTx.category} onChange={e => setNewTx({ ...newTx, category: e.target.value })} />
-              <input className="border rounded-lg px-3 py-2" placeholder="Description" value={newTx.description} onChange={e => setNewTx({ ...newTx, description: e.target.value })} />
-              <button className="bg-purple-500 text-white rounded-lg py-2">💾 Add Transaction</button>
+              <input className="border rounded-lg px-3 py-2" placeholder={t('amount')} type="number" value={newTx.amount} onChange={e => setNewTx({ ...newTx, amount: e.target.value })} />
+              <input className="border rounded-lg px-3 py-2" placeholder={t('category')} value={newTx.category} onChange={e => setNewTx({ ...newTx, category: e.target.value })} />
+              <input className="border rounded-lg px-3 py-2" placeholder={t('description')} value={newTx.description} onChange={e => setNewTx({ ...newTx, description: e.target.value })} />
+              <button className="bg-purple-500 text-white rounded-lg py-2">💾 {t('addTransaction')}</button>
             </form>
 
             {tx.length === 0 ? (
-              <EmptyState icon="📝" message="No transactions yet" subMessage="Add a transaction to see it here." color="text-purple-500" />
+              <EmptyState icon="📝" message={t('noTransactions', { defaultValue: 'No transactions yet' })} subMessage={t('addTransaction', { defaultValue: 'Add a transaction to see it here.' })} color="text-purple-500" />
             ) : (
               <ul className="space-y-3">
                 {tx.map(t => (

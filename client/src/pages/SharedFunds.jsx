@@ -204,6 +204,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import CountUp from 'react-countup'
 import EmptyState from '../components/EmptyState.jsx'
 import Toast from '../components/Toast.jsx'
+import { useTranslation } from 'react-i18next';
+
 
 export default function SharedFunds() {
   const { token, setSources } = useAuth()
@@ -211,6 +213,7 @@ export default function SharedFunds() {
   const [form, setForm] = useState({ name: '', totalAmount: 0, contributorEmails: '' })
   const [expense, setExpense] = useState({ id: '', amount: 0, category: '', description: '' })
   const [toast, setToast] = useState("")
+  const { t } = useTranslation();
 
   const load = async () => {
     setFunds(await api('/shared-funds', { token }))
@@ -232,9 +235,9 @@ export default function SharedFunds() {
       load()
     } catch (err) {
       if (err?.error === 'User(s) not found' && err.notFound) {
-        setToast(`User(s) not found: ${err.notFound.join(', ')}`)
+        setToast(`${t('userNotFound')}: ${err.notFound.join(', ')}`)
       } else {
-        setToast("Error creating fund")
+        setToast(t('errorCreatingFund', { defaultValue: 'Error creating fund' }))
       }
     }
   }
@@ -259,41 +262,40 @@ export default function SharedFunds() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* heading */}
-        <motion.h1 className="text-4xl font-extrabold mb-8">💰 Shared Funds Tracker</motion.h1>
+        <motion.h1 className="text-4xl font-extrabold mb-8">💰 {t('sharedFunds')}</motion.h1>
         <div className="grid lg:grid-cols-2 gap-8">
 
           {/* Create Fund */}
           <motion.div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl mb-4 text-teal-700">Create New Fund</h2>
+            <h2 className="text-xl mb-4 text-teal-700">{t('createFund')}</h2>
             <form onSubmit={createFund} className="space-y-3">
-              <input className="border rounded px-3 py-2 w-full" placeholder="Fund Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-              <input className="border rounded px-3 py-2 w-full" placeholder="Total Amount" type="number" value={form.totalAmount} onChange={e => setForm({ ...form, totalAmount: e.target.value })} />
-              <input className="border rounded px-3 py-2 w-full" placeholder="Contributor emails" value={form.contributorEmails} onChange={e => setForm({ ...form, contributorEmails: e.target.value })} />
-              <button className="bg-teal-500 text-white py-2 w-full rounded">➕ Create Fund</button>
+              <input className="border rounded px-3 py-2 w-full" placeholder={t('name')} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+              <input className="border rounded px-3 py-2 w-full" placeholder={t('totalBalance')} type="number" value={form.totalAmount} onChange={e => setForm({ ...form, totalAmount: e.target.value })} />
+              <input className="border rounded px-3 py-2 w-full" placeholder={t('contributors')} value={form.contributorEmails} onChange={e => setForm({ ...form, contributorEmails: e.target.value })} />
+              <button className="bg-teal-500 text-white py-2 w-full rounded">➕ {t('createFund')}</button>
             </form>
           </motion.div>
 
           {/* Add Expense */}
           <motion.div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl mb-4 text-purple-700">Add Expense</h2>
+            <h2 className="text-xl mb-4 text-purple-700">{t('addSharedExpense')}</h2>
             <form onSubmit={addExpense} className="space-y-3">
               <select className="border rounded px-3 py-2 w-full" value={expense.id} onChange={e => setExpense({ ...expense, id: e.target.value })}>
-                <option>-- Select Fund --</option>
+                <option>{t('sharedFunds')}</option>
                 {funds.map(f => <option key={f._id} value={f._id}>{f.name}</option>)}
               </select>
-              <input className="border rounded px-3 py-2 w-full" placeholder="Amount" type="number" value={expense.amount} onChange={e => setExpense({ ...expense, amount: e.target.value })} />
-              <input className="border rounded px-3 py-2 w-full" placeholder="Category" value={expense.category} onChange={e => setExpense({ ...expense, category: e.target.value })} />
-              <input className="border rounded px-3 py-2 w-full" placeholder="Description" value={expense.description} onChange={e => setExpense({ ...expense, description: e.target.value })} />
-              <button className="bg-purple-500 text-white py-2 w-full rounded">💸 Add Expense</button>
+              <input className="border rounded px-3 py-2 w-full" placeholder={t('amount')} type="number" value={expense.amount} onChange={e => setExpense({ ...expense, amount: e.target.value })} />
+              <input className="border rounded px-3 py-2 w-full" placeholder={t('category')} value={expense.category} onChange={e => setExpense({ ...expense, category: e.target.value })} />
+              <input className="border rounded px-3 py-2 w-full" placeholder={t('description')} value={expense.description} onChange={e => setExpense({ ...expense, description: e.target.value })} />
+              <button className="bg-purple-500 text-white py-2 w-full rounded">💸 {t('addSharedExpense')}</button>
             </form>
           </motion.div>
 
           {/* My Funds */}
           <motion.div className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-            <h2 className="text-xl mb-4">My Funds</h2>
+            <h2 className="text-xl mb-4">{t('myFunds')}</h2>
             {funds.length === 0 ? (
-              <EmptyState icon="💰" message="No funds created" subMessage="Start by creating a fund." color="text-teal-500" />
+              <EmptyState icon="💰" message={t('noFunds', { defaultValue: 'No funds created' })} subMessage={t('createFund', { defaultValue: 'Start by creating a fund.' })} color="text-teal-500" />
             ) : (
               <AnimatePresence>
                 {funds.map((f, i) => {
@@ -302,10 +304,10 @@ export default function SharedFunds() {
                     <motion.div key={f._id} className="flex justify-between p-4 mb-3 border rounded-lg">
                       <div>
                         <p>{f.name}</p>
-                        <p>Total: ₹<CountUp end={f.totalAmount} duration={0.8} /></p>
+                        <p>{t('totalBalance')}: ₹<CountUp end={f.totalAmount} duration={0.8} /></p>
                       </div>
                       <div className="text-right">
-                        <p>₹<CountUp end={f.remainingAmount} duration={0.8} /> left</p>
+                        <p>₹<CountUp end={f.remainingAmount} duration={0.8} /> {t('remaining')}</p>
                         <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
                           <motion.div className={f.remainingAmount > 0 ? 'bg-green-500 h-2 rounded-full' : 'bg-red-500 h-2 rounded-full'}
                             initial={{ width: 0 }} animate={{ width: `${percent}%` }} />
