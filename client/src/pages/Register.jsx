@@ -35,6 +35,8 @@
 import React, { useState } from 'react'
 import { api } from '../api.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTranslation } from 'react-i18next';
+
 
 export default function Register() {
   const { login } = useAuth()
@@ -42,6 +44,7 @@ export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
+  const { t } = useTranslation();
 
   const submit = async (e) => {
     e.preventDefault()
@@ -54,11 +57,11 @@ export default function Register() {
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <h3 className="text-2xl font-semibold text-green-700">New User? Register Here</h3>
+      <h3 className="text-2xl font-semibold text-green-700">{t('createAccount')}</h3>
       {err && <div className="text-red-600 text-sm bg-red-100 p-2 rounded shadow">{err}</div>}
       <input
         type="text"
-        placeholder="Full Name"
+        placeholder={t('name')}
         value={name}
         onChange={e => setName(e.target.value)}
         className="border border-green-300 rounded-lg px-4 py-2 focus:ring-4 focus:ring-green-300 focus:outline-none transition"
@@ -66,7 +69,7 @@ export default function Register() {
       />
       <input
         type="email"
-        placeholder="Email"
+        placeholder={t('email')}
         value={email}
         onChange={e => setEmail(e.target.value)}
         className="border border-green-300 rounded-lg px-4 py-2 focus:ring-4 focus:ring-green-300 focus:outline-none transition"
@@ -74,7 +77,7 @@ export default function Register() {
       />
       <input
         type="password"
-        placeholder="Password"
+        placeholder={t('password')}
         value={password}
         onChange={e => setPassword(e.target.value)}
         className="border border-green-300 rounded-lg px-4 py-2 focus:ring-4 focus:ring-green-300 focus:outline-none transition"
@@ -84,7 +87,7 @@ export default function Register() {
         type="submit"
         className="bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg py-3 shadow-lg transform hover:scale-105 transition"
       >
-        Register
+        {t('register')}
       </button>
     </form>
   )

@@ -35,12 +35,15 @@
 import React, { useState } from 'react'
 import { api } from '../api.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTranslation } from 'react-i18next';
+
 
 export default function Login() {
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [err, setErr] = useState('')
+  const { t } = useTranslation();
 
   const submit = async (e) => {
     e.preventDefault()
@@ -53,11 +56,11 @@ export default function Login() {
 
   return (
     <form onSubmit={submit} className="grid gap-4">
-      <h3 className="text-2xl font-semibold text-indigo-800">Login to your account</h3>
+      <h3 className="text-2xl font-semibold text-indigo-800">{t('login')}</h3>
       {err && <div className="text-red-600 text-sm bg-red-100 p-2 rounded shadow">{err}</div>}
       <input
         type="email"
-        placeholder="Email"
+        placeholder={t('email')}
         value={email}
         onChange={e => setEmail(e.target.value)}
         className="border border-indigo-300 rounded-lg px-4 py-2 focus:ring-4 focus:ring-indigo-300 focus:outline-none transition"
@@ -65,7 +68,7 @@ export default function Login() {
       />
       <input
         type="password"
-        placeholder="Password"
+        placeholder={t('password')}
         value={password}
         onChange={e => setPassword(e.target.value)}
         className="border border-indigo-300 rounded-lg px-4 py-2 focus:ring-4 focus:ring-indigo-300 focus:outline-none transition"
@@ -75,7 +78,7 @@ export default function Login() {
         type="submit"
         className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg py-3 shadow-lg transform hover:scale-105 transition"
       >
-        Log In
+        {t('login')}
       </button>
     </form>
   )

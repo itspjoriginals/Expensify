@@ -25,6 +25,13 @@ app.use('/api/transactions', transactionRoutes)
 app.use('/api/sources', sourceRoutes)
 app.use('/api/notifications', notificationRoutes)
 
+const allowedOrigins = process.env.CLIENT_ORIGIN?.split(',') || [];
+app.use(cors({
+  origin: allowedOrigins.length ? allowedOrigins : '*',
+  credentials: true,
+}));
+
+
 const PORT = process.env.PORT || 5000
 connectDB().then(() => {
   app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`))
