@@ -22,7 +22,7 @@ const API_BASE =
   import.meta.env.VITE_API_BASE ||
   (import.meta.env.MODE === 'development'
     ? 'http://localhost:5000/api'
-    : 'https://expensify-backend-ukrx.onrender.com/api');
+    : 'https://expensify-backend-server.onrender.com/api');
 
 export const api = async (path, { method = 'GET', body, token } = {}) => {
   const res = await fetch(`${API_BASE}${path}`, {
